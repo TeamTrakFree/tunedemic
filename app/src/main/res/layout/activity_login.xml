@@ -30,6 +30,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:hint="Password"
+        android:password="true"
         android:id="@+id/pass"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />

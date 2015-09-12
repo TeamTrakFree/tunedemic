@@ -3,8 +3,8 @@ package mhacks.six.tunedemic;
 import android.app.Activity;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
@@ -50,25 +50,35 @@ public class MainActivity extends ActionBarActivity
     @Override
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
-        FragmentManager fragmentManager = getSupportFragmentManager();
+        //chooseFragment(position);
+        FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                .replace(R.id.container, localSongs.newInstance(position + 1))
                 .commit();
+
+
     }
 
-    public void onSectionAttached(int number) {
-        switch (number) {
-            case 1:
-                mTitle = getString(R.string.title_section1);
-                break;
-            case 2:
-                mTitle = getString(R.string.title_section2);
-                break;
-            case 3:
-                mTitle = getString(R.string.title_section3);
-                break;
-        }
-    }
+//    public void chooseFragment(int number) {
+//        Fragment objFragment = null;
+//        switch (number) {
+//            case 1:
+//                mTitle = getString(R.string.title_section1);
+//                objFragment = new localSongs();
+//                break;
+//            case 2:
+//                mTitle = getString(R.string.title_section2);
+//                break;
+//            case 3:
+//                mTitle = getString(R.string.title_section3);
+//                break;
+//        }
+//
+////        FragmentManager fragmentManager = getFragmentManager();
+////        fragmentManager.beginTransaction()
+////                .replace(R.id.container, objFragment)
+////                .commit();
+//    }
 
     public void restoreActionBar() {
         ActionBar actionBar = getSupportActionBar();
@@ -141,7 +151,7 @@ public class MainActivity extends ActionBarActivity
         @Override
         public void onAttach(Activity activity) {
             super.onAttach(activity);
-            ((MainActivity) activity).onSectionAttached(
+            ((MainActivity) activity).onNavigationDrawerItemSelected(
                     getArguments().getInt(ARG_SECTION_NUMBER));
         }
     }

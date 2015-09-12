@@ -1,6 +1,8 @@
 package mhacks.six.tunedemic;
 
 import android.content.ClipData;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +15,7 @@ import android.widget.Toast;
 
 import com.microsoft.windowsazure.mobileservices.*;
 import com.microsoft.windowsazure.mobileservices.http.ServiceFilterResponse;
+import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
 import com.microsoft.windowsazure.mobileservices.table.TableOperationCallback;
 
 import java.net.MalformedURLException;
@@ -22,8 +25,10 @@ public class LoginActivity extends ActionBarActivity {
     Button bLogin;
     EditText tUser;
     EditText tPass;
+    Boolean badInput, done;
 
     private MobileServiceClient mClient;
+    private MobileServiceTable<Users> mUsersTable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +38,8 @@ public class LoginActivity extends ActionBarActivity {
         bLogin = (Button) findViewById(R.id.submit);
         tUser = (EditText) findViewById(R.id.user);
         tPass = (EditText) findViewById(R.id.pass);
+        badInput = true;
+
 
         final Users user = new Users();
 
@@ -51,13 +58,54 @@ public class LoginActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 /*TODO: Login system*/
-
+                /*TODO: Login system*/
+                Log.i("CLICKED", "JUST CLICKED LOGGED IN");
                 user.email = tUser.getText().toString();
                 user.password = tPass.getText().toString();
-                
 
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        try {
+                            mUsersTable = mClient.getTable(Users.class);
+                            MobileServiceList<Users> result = mUsersTable.where().field("email").eq(user.email).execute().get();
+                            if(!result.isEmpty()) {
+                                for (Users u : result) {
+                                    if (user.password.equals(u.password)) {
+                                        badInput = false;
+                                    } else
+                                        badInput = true;
+                                }
+                            }
+                            else
+                                badInput = true;
+
+                        } catch (Exception exception) {
+                            //   Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_LONG).show();
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void aVoid) {
+                        super.onPostExecute(aVoid);
+
+                        if(badInput == true)
+                            Toast.makeText(getApplicationContext(), "Error Wrong Username or Password. Please Try Again.", Toast.LENGTH_LONG).show();
+                        else{
+                            Intent launchactivity = new Intent(LoginActivity.this, MainActivity.class);
+                            startActivity(launchactivity);
+                        }
+                    }
+                }.execute();
             }
         });
+
+
+
+
+
+
     }
 
     @Override
