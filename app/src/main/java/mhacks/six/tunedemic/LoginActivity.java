@@ -23,9 +23,10 @@ import java.net.MalformedURLException;
 public class LoginActivity extends ActionBarActivity {
 
     Button bLogin;
+    Button bCreate;
     EditText tUser;
     EditText tPass;
-    Boolean badInput, done;
+    Boolean badInput;
 
     private MobileServiceClient mClient;
     private MobileServiceTable<Users> mUsersTable;
@@ -38,8 +39,9 @@ public class LoginActivity extends ActionBarActivity {
         bLogin = (Button) findViewById(R.id.submit);
         tUser = (EditText) findViewById(R.id.user);
         tPass = (EditText) findViewById(R.id.pass);
-        badInput = true;
+        bCreate = (Button) findViewById(R.id.accbutton);
 
+        badInput = true;
 
         final Users user = new Users();
 
@@ -52,7 +54,15 @@ public class LoginActivity extends ActionBarActivity {
        }
        catch(MalformedURLException murl){
             Log.e("TAG", "Malformed URL");
-        }
+       }
+
+        bCreate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent a = new Intent(LoginActivity.this, CreateAccount.class);
+                startActivity(a);
+            }
+        });
 
         bLogin.setOnClickListener(new View.OnClickListener() {
             @Override

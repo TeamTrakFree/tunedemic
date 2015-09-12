@@ -34,9 +34,9 @@ public class CreateAccount extends ActionBarActivity {
 
 
 
-        bCreate = (Button) findViewById(R.id.submit);
-        tEmail = (EditText) findViewById(R.id.user);
-        tPass = (EditText) findViewById(R.id.pass);
+        bCreate = (Button) findViewById(R.id.create);
+        tEmail = (EditText) findViewById(R.id.email);
+        tPass = (EditText) findViewById(R.id.psswd);
 
         final Users user = new Users();
 

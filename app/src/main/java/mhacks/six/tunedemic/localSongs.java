@@ -3,6 +3,7 @@ package mhacks.six.tunedemic;
 import android.app.Activity;
 import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -24,8 +25,15 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.microsoft.windowsazure.mobileservices.MobileServiceList;
+import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
+import com.microsoft.windowsazure.mobileservices.*;
 
+
+import java.net.MalformedURLException;
+import java.util.ArrayList;
 
 
 public class localSongs extends Fragment implements ConnectionCallbacks, OnConnectionFailedListener{
@@ -43,6 +51,8 @@ public class localSongs extends Fragment implements ConnectionCallbacks, OnConne
     private GoogleMap mymap;
     LatLng mylocation;
     View rootview;
+
+    ArrayList<Nodes> localNodes;
 
     public static localSongs newInstance(int position) {
         localSongs fragment = new localSongs();
@@ -149,14 +159,77 @@ public class localSongs extends Fragment implements ConnectionCallbacks, OnConne
 
         mymap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
-        MapsInitializer.initialize(this.getActivity());
+        mylocation = new LatLng(myLat, myLong);
 
-        mymap.setMyLocationEnabled(true);
+        final MobileServiceClient mClient;
 
-        mylocation = new LatLng(20, 30);
+        localNodes = new ArrayList<Nodes>();
 
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(mylocation, 17);
-        mymap.animateCamera(cameraUpdate);
+
+        try{
+            mClient = new MobileServiceClient (
+                    "https://tunedemic.azure-mobile.net/",
+                    "ceLnwHzMkiIjIHQqCTZSLHjGyfVxPJ90",
+                    this.getActivity()
+            );
+            new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    try {
+                        MobileServiceTable<Nodes> mNodesTable = mClient.getTable(Nodes.class);
+                        MobileServiceList<Nodes> result = mNodesTable.execute().get();
+                        if(!result.isEmpty()) {
+                            for (Nodes n : result) {
+                                float[] resultarray = new float[1];
+                                Location.distanceBetween(mylocation.latitude, mylocation.longitude, n.latitude, n.longitude, resultarray);
+
+                                //if (resultarray[0] <= n.radius){
+                                    localNodes.add(n);
+                               // }
+                            }
+                        }
+                        else{}
+
+
+                    } catch (Exception exception) {
+                        //   Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_LONG).show();
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(Void aVoid) {
+                    super.onPostExecute(aVoid);
+
+                    Toast.makeText(getActivity().getApplicationContext(), Integer.toString(localNodes.size()),Toast.LENGTH_LONG ).show();
+                    LatLng test = null;
+                    for (Nodes oneNode : localNodes){
+                        test = new LatLng(oneNode.latitude, oneNode.longitude * -1);
+                        mymap.addCircle(new CircleOptions()
+                                .center(test)
+                                .radius(oneNode.radius)
+                                .fillColor(0x7F3F97)
+                                .strokeColor(0x7F3F97)
+                        );
+                        Toast.makeText(getActivity().getApplicationContext(), Float.toString(oneNode.radius), Toast.LENGTH_LONG).show();
+                    }
+
+                    MapsInitializer.initialize(getActivity());
+
+                    mymap.setMyLocationEnabled(true);
+
+                    myLat = localNodes.get(0).latitude;
+                    myLong = localNodes.get(0).longitude * -1;
+                    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(test, 17);
+                    mymap.animateCamera(cameraUpdate);
+
+                }
+            }.execute();
+
+        }
+        catch(MalformedURLException murl){
+            Log.e("TAG", "Malformed URL");
+        }
 
         return rootview;
     }
