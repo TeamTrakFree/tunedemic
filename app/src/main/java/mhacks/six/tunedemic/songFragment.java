@@ -18,9 +18,17 @@ import android.widget.Toast;
 
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.MobileServiceList;
+import com.microsoft.windowsazure.mobileservices.http.ServiceFilterResponse;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
+import com.microsoft.windowsazure.mobileservices.table.TableOperationCallback;
 
+import org.w3c.dom.Node;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 
 
@@ -33,14 +41,26 @@ public class songFragment extends Fragment{
     String nodeID;
     MobileServiceClient mClient;
     String playURL;
+    String uploader;
     String title = "", artist = "";
     float nodeScore;
+    int scoreCount;
     Boolean playing, already;
 
     MediaPlayer mediaPlayer;
 
     ImageButton playButton;
+    ImageButton viewVoteDown;
+    ImageButton viewVoteUp;
+    ImageButton pickup;
     View rootview;
+    TextView viewTitle;
+    TextView viewArtist;
+    TextView viewScore;
+    TextView viewUploader;
+
+    Nodes n;
+
 
     public songFragment() {
         // Required empty public constructor
@@ -55,9 +75,11 @@ public class songFragment extends Fragment{
         nodeID = args.getString("nodeID");
         playURL = "";
         playing = false;
-
         rootview =  inflater.inflate(R.layout.fragment_song, container, false);
-
+        viewTitle = (TextView) rootview.findViewById(R.id.viewTitle);
+        viewArtist = (TextView) rootview.findViewById(R.id.viewArtist);
+        viewScore = (TextView) rootview.findViewById(R.id.viewScore);
+        viewUploader = (TextView) rootview.findViewById(R.id.viewUploader);
         try{
             mClient = new MobileServiceClient(
                     "https://tunedemic.azure-mobile.net/",
@@ -68,7 +90,6 @@ public class songFragment extends Fragment{
         catch(MalformedURLException murl){
             Log.e("TAG", "Malformed URL");
         }
-
         getSong();
         return rootview;
     }
@@ -85,8 +106,10 @@ public class songFragment extends Fragment{
                     MobileServiceList<Nodes> getNodes = mNodesTable.where().field("id").eq(nodeID).execute().get();
                     MobileServiceList<Songs> result = null;
                     for (Nodes str : getNodes){
+                        uploader = str.owner;
                         playURL = str.url;
                         nodeScore = str.votes;
+                        n = str;
                         result = mSongsTable.where().field("url").eq(playURL).execute().get();
                     }
                     if (result != null) {
@@ -104,8 +127,11 @@ public class songFragment extends Fragment{
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-
-                Toast.makeText(getActivity().getApplicationContext(), "PostExecute", Toast.LENGTH_LONG).show();
+                viewTitle.setText("\"" + title + "\"");
+                viewArtist.setText(artist);
+                viewScore.setText(""+(int)nodeScore);
+                viewUploader.setText(uploader);
+                //Toast.makeText(getActivity().getApplicationContext(), "PostExecute", Toast.LENGTH_LONG).show();
                 setUpInit();
 
             }
@@ -114,6 +140,7 @@ public class songFragment extends Fragment{
 
     public void setUpInit() {
         playButton = (ImageButton) rootview.findViewById(R.id.playButton);
+        pickup = (ImageButton) rootview.findViewById(R.id.pickUpButton);
         already = false;
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
@@ -133,24 +160,69 @@ public class songFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 if (!mediaPlayer.isPlaying()) {
-                        if (!already) {
-                            songInit();
-                            already = true;
-                        }
-                        mediaPlayer.start();
-                        playButton.setImageResource(R.drawable.pause);
+                    if (!already) {
+                        songInit();
+                        already = true;
+                    }
+                    mediaPlayer.start();
+                    playButton.setImageResource(R.drawable.pause);
 
-                }else {
+                } else {
                     mediaPlayer.pause();
                     playButton.setImageResource(R.drawable.playl);
                 }
             }
         });
+        pickup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final File outFile = new File(getActivity().getFilesDir(), "mytunes");
+                OutputStream out = null;
+                try {
+                    out = new BufferedOutputStream(new FileOutputStream(outFile));
+                    out.write(playURL.getBytes());
+                    Toast.makeText(getActivity().getApplicationContext(), "Song Saved!", Toast.LENGTH_LONG).show();
+                        if (out != null)
+                            out.close();
 
+                }
+                catch(IOException ioe){
+
+                }
+            }
+        });
+
+        viewVoteUp = (ImageButton) rootview.findViewById(R.id.viewVoteUp);
+        viewVoteDown = (ImageButton) rootview.findViewById(R.id.viewVoteDown);
+
+        viewVoteUp.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        n.votes += 1;
+                        n.radius += 20;
+                        mClient.getTable(Nodes.class).update(n);
+                        viewScore.setText(String.valueOf(n.votes));
+                    }
+                }
+        );
+
+        viewVoteDown.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                n.votes -= 1;
+                n.radius -= 20;
+                if (n.radius < 0)
+                    n.radius = 0;
+                mClient.getTable(Nodes.class).update(n);
+                viewScore.setText(String.valueOf(n.votes));
+            }
+        });
     }
 
-    public void songInit(){
-        try{
+
+    public void songInit() {
+        try {
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mediaPlayer.setDataSource("http://" + playURL);
             mediaPlayer.prepare(); // might take long! (for buffering, etc)
@@ -158,4 +230,7 @@ public class songFragment extends Fragment{
             e.printStackTrace();
         }
     }
+
+
 }
+

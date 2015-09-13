@@ -10,13 +10,17 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Login"
+        android:text="LOG IN"
         android:id="@+id/submit"
         android:layout_marginBottom="131dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:minHeight="80dp"
-        android:minWidth="300dp" />
+        android:minWidth="300dp"
+        android:background="#7f3f97"
+        android:elevation="5dp"
+        android:textColor="#FFFFFF"
+        android:textSize="50dp" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -32,7 +36,9 @@
         android:layout_centerHorizontal="true"
         android:background="#ffffff"
         android:textAlignment="center"
-        android:gravity="center" />
+        android:gravity="center"
+        android:elevation="5dp"
+        android:maxLines="1"/>
 
     <EditText
         android:layout_width="wrap_content"
@@ -47,7 +53,9 @@
         android:minWidth="300dp"
         android:background="#ffffff"
         android:gravity="center"
-        android:textAlignment="center" />
+        android:textAlignment="center"
+        android:elevation="5dp"
+        android:maxLines="1"/>
     <ImageView
         android:layout_width="fill_parent"
         android:layout_height="match_parent"

@@ -1,15 +1,137 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="mhacks.six.tunedemic.songFragment">
+    android:layout_height="match_parent" tools:context="mhacks.six.tunedemic.songFragment"
+    android:background="#d6d6d6">
 
 
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Play"
-        android:src="@drawable/playl"
-        android:background="@android:color/transparent"
         android:id="@+id/playButton"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:src="@drawable/playl"
+        android:minHeight="100dp"
+        android:minWidth="100dp"
+        android:adjustViewBounds="true"
+        android:background="@android:color/transparent"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="80dp"
+        android:elevation="3dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/viewTitle"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:elegantTextHeight="true"
+        android:textSize="45dp"
+        android:textAlignment="center"
+        android:gravity="center_vertical|center|center_horizontal"
+        android:height="120dp"
+        android:elevation="3dp"
+        android:textColor="#7f3f97" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/viewArtist"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="115dp"
+        android:gravity="center_vertical|center|center_horizontal"
+        android:height="60dp"
+        android:textAlignment="center"
+        android:textColor="#7f3f97" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/viewScore"
+        android:layout_above="@+id/playButton"
+        android:layout_centerHorizontal="true"
+        android:height="100dp"
+        android:gravity="center_vertical|center|center_horizontal"
+        android:textAlignment="center"
+        android:layout_marginBottom="0dp"
+        android:minWidth="200dp"
+        android:textSize="55dp"
+        android:maxWidth="200dp"
+        android:elevation="5dp"
+        android:textColor="#ffffff"
+        android:layout_margin="50dp"
+        android:inputType="number" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/viewVoteUp"
+        android:src="@drawable/volumeup96"
+        android:layout_above="@+id/playButton"
+        android:layout_toRightOf="@+id/playButton"
+        android:layout_toEndOf="@+id/playButton"
+        android:layout_marginBottom="0dp"
+        android:alpha=".75"
+        android:background="@android:color/transparent"
+        android:elevation="3dp"
+        android:nestedScrollingEnabled="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Uploader"
+        android:id="@+id/uploader"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="45dp"
+        android:textAlignment="center"
+        android:gravity="center_vertical|center|center_horizontal"
+        android:textColor="#a1a1a1" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/viewUploader"
+        android:textAlignment="center"
+        android:gravity="center_vertical|center|center_horizontal"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
+        android:textSize="25dp"
+        android:textColor="#666666" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/viewVoteDown"
+        android:src="@drawable/mute96"
+        android:alpha=".75"
+        android:layout_alignTop="@+id/viewVoteUp"
+        android:layout_toLeftOf="@+id/playButton"
+        android:layout_toStartOf="@+id/playButton"
+        android:background="@android:color/transparent"
+        android:elevation="3dp" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/pickUpButton"
+        android:src="@drawable/cloud96"
+        android:elevation="3dp"
+        android:maxHeight="100dp"
+        android:maxWidth="100dp"
+        android:minHeight="100dp"
+        android:minWidth="100dp"
+        android:background="@android:color/transparent"
+        android:layout_below="@+id/viewTitle"
+        android:layout_toRightOf="@+id/viewVoteDown"
+        android:layout_toEndOf="@+id/viewVoteDown"
+        android:layout_marginTop="5dp" />
+
 </RelativeLayout>

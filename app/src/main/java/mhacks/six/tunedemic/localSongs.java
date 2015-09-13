@@ -133,6 +133,7 @@ public class localSongs extends Fragment implements ConnectionCallbacks, OnConne
             myLong = mLastLocation.getLongitude();
 
             mylocation = new LatLng(myLat, myLong);
+            MainActivity.globalPos = mylocation;
 
            // Toast.makeText(getActivity().getApplicationContext(), String.valueOf(myLat) + " " + String.valueOf(myLong), Toast.LENGTH_LONG).show();
             setMap();
@@ -184,7 +185,7 @@ public class localSongs extends Fragment implements ConnectionCallbacks, OnConne
                         mymap.addCircle(new CircleOptions()
                                         .center(temp)
                                         .radius(oneNode.radius)
-                                        .fillColor(Color.parseColor("#407F3F97"))
+                                        .fillColor(Color.parseColor("#107F3F97"))
                                         .strokeColor(Color.parseColor("#7F3F97"))
                         );
                         tempM = mymap.addMarker(new MarkerOptions()

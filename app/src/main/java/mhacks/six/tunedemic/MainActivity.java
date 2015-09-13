@@ -19,11 +19,15 @@ import android.support.v4.widget.DrawerLayout;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.io.File;
 
 
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+
+    public static LatLng globalPos = null;
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -65,6 +69,7 @@ public class MainActivity extends ActionBarActivity
                 break;
             case 1:
                 mTitle = getString(R.string.title_section2);
+                objFragment = new TuneFragment();
                 break;
             case 2:
                 mTitle = getString(R.string.title_section3);
