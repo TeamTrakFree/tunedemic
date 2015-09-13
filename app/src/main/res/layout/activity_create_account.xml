@@ -4,7 +4,9 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="mhacks.six.tunedemic.CreateAccount">
+    tools:context="mhacks.six.tunedemic.CreateAccount"
+    android:background="#d6d6d6">
+
 
 
     <Button
@@ -12,9 +14,15 @@
         android:layout_height="wrap_content"
         android:text="Create Account"
         android:id="@+id/create"
-        android:layout_marginBottom="131dp"
+        android:layout_marginBottom="62dp"
+        android:minWidth="300dp"
+        android:minHeight="80dp"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignLeft="@+id/psswd"
+        android:layout_alignStart="@+id/psswd"
+        android:background="#7f3f97"
+        android:textColor="#ffffff"
+        android:textSize="25dp" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -22,9 +30,13 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:hint="Username"
         android:id="@+id/email"
-        android:layout_above="@+id/create"
+        android:minWidth="300dp"
+        android:background="#ffffff"
+        android:layout_marginBottom="62dp"
+        android:layout_above="@+id/psswd"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="156dp" />
+        android:gravity="center"
+        android:textAlignment="center" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -32,7 +44,20 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:hint="Password"
         android:id="@+id/psswd"
+        android:minWidth="300dp"
+        android:background="#ffffff"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:textAlignment="center"
+        android:gravity="center" />
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/tunedemiciconp"
+        android:id="@+id/imageView"
+        android:layout_above="@+id/email"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="45dp" />
 
 </RelativeLayout>

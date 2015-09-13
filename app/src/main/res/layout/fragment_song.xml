@@ -3,10 +3,12 @@
     android:layout_height="match_parent" tools:context="mhacks.six.tunedemic.songFragment">
 
 
-    <Button
+    <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Play"
+        android:src="@drawable/playl"
+        android:background="@android:color/transparent"
         android:id="@+id/playButton"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />

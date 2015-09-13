@@ -177,7 +177,7 @@ public class localSongs extends Fragment implements ConnectionCallbacks, OnConne
                 protected void onPostExecute(Void aVoid) {
                     super.onPostExecute(aVoid);
 
-                    Toast.makeText(getActivity().getApplicationContext(), Integer.toString(localNodes.size()),Toast.LENGTH_LONG ).show();
+                  //Toast.makeText(getActivity().getApplicationContext(), Integer.toString(localNodes.size()),Toast.LENGTH_LONG ).show();
                     for (Nodes oneNode : localNodes){
                         LatLng temp = new LatLng(oneNode.latitude, oneNode.longitude);
                         Marker tempM;

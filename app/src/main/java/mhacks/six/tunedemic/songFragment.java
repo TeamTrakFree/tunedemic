@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,11 +35,11 @@ public class songFragment extends Fragment{
     String playURL;
     String title = "", artist = "";
     float nodeScore;
-    Boolean playing;
+    Boolean playing, already;
 
     MediaPlayer mediaPlayer;
 
-    Button playButton;
+    ImageButton playButton;
     View rootview;
 
     public songFragment() {
@@ -112,8 +113,8 @@ public class songFragment extends Fragment{
     }
 
     public void setUpInit() {
-        playButton = (Button) rootview.findViewById(R.id.playButton);
-
+        playButton = (ImageButton) rootview.findViewById(R.id.playButton);
+        already = false;
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
             @Override
@@ -131,17 +132,30 @@ public class songFragment extends Fragment{
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    MediaPlayer mediaPlayer = new MediaPlayer();
-                    mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                    mediaPlayer.setDataSource("http://" + playURL);
-                    mediaPlayer.prepare(); // might take long! (for buffering, etc)
-                    mediaPlayer.start();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if (!mediaPlayer.isPlaying()) {
+                        if (!already) {
+                            songInit();
+                            already = true;
+                        }
+                        mediaPlayer.start();
+                        playButton.setImageResource(R.drawable.pause);
+
+                }else {
+                    mediaPlayer.pause();
+                    playButton.setImageResource(R.drawable.playl);
                 }
             }
         });
 
+    }
+
+    public void songInit(){
+        try{
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            mediaPlayer.setDataSource("http://" + playURL);
+            mediaPlayer.prepare(); // might take long! (for buffering, etc)
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
