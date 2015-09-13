@@ -1,6 +1,7 @@
 package mhacks.six.tunedemic;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.app.Fragment;
@@ -17,6 +18,8 @@ import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
+import java.io.File;
 
 
 public class MainActivity extends ActionBarActivity
@@ -51,12 +54,36 @@ public class MainActivity extends ActionBarActivity
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
         //chooseFragment(position);
-        FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, localSongs.newInstance(position + 1))
-                .commit();
 
+        Boolean leaving = false;
 
+        Fragment objFragment = null;
+        switch (position) {
+            case 0:
+                mTitle = getString(R.string.title_section1);
+                objFragment = new localSongs();
+                break;
+            case 1:
+                mTitle = getString(R.string.title_section2);
+                break;
+            case 2:
+                mTitle = getString(R.string.title_section3);
+                File closeFile = new File (getFilesDir(), "session");
+                if (closeFile.exists()){
+                    closeFile.delete();
+                    leaving = true;
+                    Intent exiter = new Intent(MainActivity.this, LoginActivity.class);
+                    startActivity(exiter);
+                }
+
+                break;
+        }
+        if (!leaving) {
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.container, objFragment)
+                    .commit();
+        }
     }
 
 //    public void chooseFragment(int number) {

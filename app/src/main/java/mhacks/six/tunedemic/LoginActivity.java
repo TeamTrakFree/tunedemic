@@ -1,6 +1,7 @@
 package mhacks.six.tunedemic;
 
 import android.content.ClipData;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
@@ -18,6 +19,9 @@ import com.microsoft.windowsazure.mobileservices.http.ServiceFilterResponse;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
 import com.microsoft.windowsazure.mobileservices.table.TableOperationCallback;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.net.MalformedURLException;
 
 public class LoginActivity extends ActionBarActivity {
@@ -32,9 +36,23 @@ public class LoginActivity extends ActionBarActivity {
     private MobileServiceTable<Users> mUsersTable;
 
     @Override
+    protected void onResume(){
+        super.onResume();
+        if (checkLogin()){
+            Intent goTo = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(goTo);
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        if (checkLogin()){
+            Intent goTo = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(goTo);
+        }
 
         bLogin = (Button) findViewById(R.id.submit);
         tUser = (EditText) findViewById(R.id.user);
@@ -103,6 +121,17 @@ public class LoginActivity extends ActionBarActivity {
                         if(badInput == true)
                             Toast.makeText(getApplicationContext(), "Error Wrong Username or Password. Please Try Again.", Toast.LENGTH_LONG).show();
                         else{
+                            String filename = "session";
+                            String data = "Session in Progress";
+                            FileOutputStream outputStream;
+
+                            try {
+                                outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
+                                outputStream.write(data.getBytes());
+                                outputStream.close();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                             Intent launchactivity = new Intent(LoginActivity.this, MainActivity.class);
                             startActivity(launchactivity);
                         }
@@ -116,6 +145,15 @@ public class LoginActivity extends ActionBarActivity {
 
 
 
+    }
+
+    public boolean checkLogin(){
+        File sessionFile = new File(getFilesDir(), "session");
+        if(sessionFile.exists()){
+            return true;
+        }
+        else
+            return false;
     }
 
     @Override
