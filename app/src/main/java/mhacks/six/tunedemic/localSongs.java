@@ -1,6 +1,7 @@
 package mhacks.six.tunedemic;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -41,6 +42,7 @@ public class localSongs extends Fragment implements ConnectionCallbacks, OnConne
     String TAG = "TAG";
 
     GoogleApiClient mGoogleApiClient;
+    MobileServiceClient mClient;
 
     Location mLastLocation;
    // TextView mLatitudeText;
@@ -124,8 +126,75 @@ public class localSongs extends Fragment implements ConnectionCallbacks, OnConne
             //Toast.makeText(getActivity().getApplicationContext(), String.valueOf(mLastLocation.getLatitude()), Toast.LENGTH_LONG).show();
             //mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
             //mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
-            myLat = mLastLocation.getLatitude();
-            myLong = mLastLocation.getLongitude();
+//            myLat = mLastLocation.getLatitude();
+//            myLong = mLastLocation.getLongitude();
+
+            try{
+                mClient = new MobileServiceClient (
+                        "https://tunedemic.azure-mobile.net/",
+                        "ceLnwHzMkiIjIHQqCTZSLHjGyfVxPJ90",
+                        this.getActivity()
+                );
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        try {
+                            myLat = mLastLocation.getLatitude();
+                            myLong = mLastLocation.getLongitude();
+                            MobileServiceTable<Nodes> mNodesTable = mClient.getTable(Nodes.class);
+                            MobileServiceList<Nodes> result = mNodesTable.execute().get();
+                            if(!result.isEmpty()) {
+                                for (Nodes n : result) {
+                                    float[] resultarray = new float[1];
+                                    Location.distanceBetween(mylocation.latitude, mylocation.longitude, n.latitude, n.longitude, resultarray);
+
+                                    if (resultarray[0] <= n.radius){
+                                        localNodes.add(n);
+                                    }
+                                    Log.e("MATH", "ERROR: " + resultarray[0] + " " + n.latitude + " " + n.longitude);
+                                    Log.e("MATH", "MINE: " + mylocation.latitude + " " + mylocation.longitude);
+                                }
+                            }
+                            else{}
+
+
+                        } catch (Exception exception) {
+                            //   Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_LONG).show();
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void aVoid) {
+                        super.onPostExecute(aVoid);
+
+                        mylocation = new LatLng(myLat, myLong);
+                        Toast.makeText(getActivity().getApplicationContext(), Integer.toString(localNodes.size()),Toast.LENGTH_LONG ).show();
+                        for (Nodes oneNode : localNodes){
+                            mymap.addCircle(new CircleOptions()
+                                            .center(new LatLng(oneNode.latitude, oneNode.longitude))
+                                            .radius(oneNode.radius)
+                                            .fillColor(Color.parseColor("#407F3F97"))
+                                            .strokeColor(Color.parseColor("#7F3F97"))
+                            );
+                            Toast.makeText(getActivity().getApplicationContext(), Float.toString(oneNode.radius), Toast.LENGTH_LONG).show();
+                        }
+
+                        MapsInitializer.initialize(getActivity());
+
+                        mymap.setMyLocationEnabled(true);
+
+
+                        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(mylocation, 17);
+                        mymap.animateCamera(cameraUpdate);
+
+                    }
+                }.execute();
+
+            }
+            catch(MalformedURLException murl){
+                Log.e("TAG", "Malformed URL");
+            }
         } else {
             Toast.makeText(this.getActivity(), "OH NO", Toast.LENGTH_LONG).show();
         }
@@ -151,7 +220,7 @@ public class localSongs extends Fragment implements ConnectionCallbacks, OnConne
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         rootview = inflater.inflate(R.layout.fragment_local_songs, container, false);
-        buildGoogleApiClient();
+        localNodes = new ArrayList<Nodes>();
 
         mapView = (MapView) rootview.findViewById(R.id.map);
         mapView.onCreate(savedInstanceState);
@@ -159,77 +228,78 @@ public class localSongs extends Fragment implements ConnectionCallbacks, OnConne
 
         mymap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
-        mylocation = new LatLng(myLat, myLong);
+        buildGoogleApiClient();
 
-        final MobileServiceClient mClient;
+//        mylocation = new LatLng(myLat, myLong);
 
-        localNodes = new ArrayList<Nodes>();
-
-
-        try{
-            mClient = new MobileServiceClient (
-                    "https://tunedemic.azure-mobile.net/",
-                    "ceLnwHzMkiIjIHQqCTZSLHjGyfVxPJ90",
-                    this.getActivity()
-            );
-            new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... params) {
-                    try {
-                        MobileServiceTable<Nodes> mNodesTable = mClient.getTable(Nodes.class);
-                        MobileServiceList<Nodes> result = mNodesTable.execute().get();
-                        if(!result.isEmpty()) {
-                            for (Nodes n : result) {
-                                float[] resultarray = new float[1];
-                                Location.distanceBetween(mylocation.latitude, mylocation.longitude, n.latitude, n.longitude, resultarray);
-
-                                //if (resultarray[0] <= n.radius){
-                                    localNodes.add(n);
-                               // }
-                            }
-                        }
-                        else{}
+//        final MobileServiceClient mClient;
 
 
-                    } catch (Exception exception) {
-                        //   Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_LONG).show();
-                    }
-                    return null;
-                }
 
-                @Override
-                protected void onPostExecute(Void aVoid) {
-                    super.onPostExecute(aVoid);
 
-                    Toast.makeText(getActivity().getApplicationContext(), Integer.toString(localNodes.size()),Toast.LENGTH_LONG ).show();
-                    LatLng test = null;
-                    for (Nodes oneNode : localNodes){
-                        test = new LatLng(oneNode.latitude, oneNode.longitude * -1);
-                        mymap.addCircle(new CircleOptions()
-                                .center(test)
-                                .radius(oneNode.radius)
-                                .fillColor(0x7F3F97)
-                                .strokeColor(0x7F3F97)
-                        );
-                        Toast.makeText(getActivity().getApplicationContext(), Float.toString(oneNode.radius), Toast.LENGTH_LONG).show();
-                    }
-
-                    MapsInitializer.initialize(getActivity());
-
-                    mymap.setMyLocationEnabled(true);
-
-                    myLat = localNodes.get(0).latitude;
-                    myLong = localNodes.get(0).longitude * -1;
-                    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(test, 17);
-                    mymap.animateCamera(cameraUpdate);
-
-                }
-            }.execute();
-
-        }
-        catch(MalformedURLException murl){
-            Log.e("TAG", "Malformed URL");
-        }
+//        try{
+//            mClient = new MobileServiceClient (
+//                    "https://tunedemic.azure-mobile.net/",
+//                    "ceLnwHzMkiIjIHQqCTZSLHjGyfVxPJ90",
+//                    this.getActivity()
+//            );
+//            new AsyncTask<Void, Void, Void>() {
+//                @Override
+//                protected Void doInBackground(Void... params) {
+//                    try {
+//                        MobileServiceTable<Nodes> mNodesTable = mClient.getTable(Nodes.class);
+//                        MobileServiceList<Nodes> result = mNodesTable.execute().get();
+//                        if(!result.isEmpty()) {
+//                            for (Nodes n : result) {
+//                                float[] resultarray = new float[1];
+//                                Location.distanceBetween(mylocation.latitude, mylocation.longitude, n.latitude, n.longitude, resultarray);
+//
+//                                if (resultarray[0] <= n.radius){
+//                                    localNodes.add(n);
+//                                }
+//                                Log.e("MATH", "ERROR: " + resultarray[0] + " " + n.latitude + " " + n.longitude);
+//                                Log.e("MATH", "MINE: " + mylocation.latitude + " " + mylocation.longitude);
+//                            }
+//                        }
+//                        else{}
+//
+//
+//                    } catch (Exception exception) {
+//                        //   Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_LONG).show();
+//                    }
+//                    return null;
+//                }
+//
+//                @Override
+//                protected void onPostExecute(Void aVoid) {
+//                    super.onPostExecute(aVoid);
+//
+//                    Toast.makeText(getActivity().getApplicationContext(), Integer.toString(localNodes.size()),Toast.LENGTH_LONG ).show();
+//                    for (Nodes oneNode : localNodes){
+//                        mymap.addCircle(new CircleOptions()
+//                                .center(new LatLng(oneNode.latitude, oneNode.longitude))
+//                                .radius(oneNode.radius)
+//                                .fillColor(Color.parseColor("#407F3F97"))
+//                                .strokeColor(Color.parseColor("#7F3F97"))
+//                        );
+//                        Toast.makeText(getActivity().getApplicationContext(), Float.toString(oneNode.radius), Toast.LENGTH_LONG).show();
+//                    }
+//
+//                    MapsInitializer.initialize(getActivity());
+//
+//                    mymap.setMyLocationEnabled(true);
+//
+//
+//                    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(mylocation, 17);
+//                    mymap.animateCamera(cameraUpdate);
+//
+//                }
+//            }.execute();
+//
+//        }
+//        catch(MalformedURLException murl){
+//            Log.e("TAG", "Malformed URL");
+//        }
 
         return rootview;
     }
