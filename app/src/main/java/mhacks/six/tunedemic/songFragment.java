@@ -231,6 +231,13 @@ public class songFragment extends Fragment{
         }
     }
 
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        mediaPlayer.stop();
+        mediaPlayer.release();
+    }
+
 
 }
 
